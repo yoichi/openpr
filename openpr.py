@@ -6,8 +6,8 @@ Supported Services: GitHub, Bitbucket
 """
 
 import argparse
-import commands
 import re
+import subprocess
 import sys
 import webbrowser
 
@@ -37,25 +37,14 @@ def extract_service_and_module(repo_url):
     return (service, module)
 
 
-def _run_command(command):
-    """Run a command.
-
-    :return: command output
-    :rtype: str
-    """
-    (status, output) = commands.getstatusoutput(command)
-    if status != 0:
-        raise Exception('"{0}" failed: {1}'.format(command, status))
-    return output
-
-
 def get_remote_url():
     """Get remote repository url of current git repository.
 
     :return: remote repository url
     :rtype: str
     """
-    return _run_command('git remote get-url origin')
+    args = ['git', 'remote', 'get-url', 'origin']
+    return subprocess.check_output(args).strip().decode('utf-8')
 
 
 def get_pull_request_number(revision, base_branch):
@@ -69,15 +58,15 @@ def get_pull_request_number(revision, base_branch):
     """
     if not re.match('^[0-9a-f]+$', revision):
         raise Exception('invalid revision: {0}'.format(revision))
-    command = 'git log {options} {revision}...{base_branch}'.format(
-        **{'options': '--merges --oneline --reverse --ancestry-path',
-           'revision': revision,
-           'base_branch': base_branch})
-    output = _run_command(command)
-    m = re.search('pull request #(\d+)', output)
+    args = ['git', 'log',
+            '--merges', '--oneline', '--reverse', '--ancestry-path',
+            '{revision}...{base_branch}'.format(
+                **{'revision': revision, 'base_branch': base_branch})]
+    output = subprocess.check_output(args)
+    m = re.search('pull request #(\d+)', output.decode('utf-8'))
     if not m:
         raise Exception(
-            'cannot detect pull request number by {0}'.format(command))
+            'cannot detect pull request number by {0}'.format(' '.join(args)))
     return m.group(1)
 
 
@@ -132,5 +121,5 @@ if __name__ == '__main__':
         main(args.revision, args.base_branch, args.print_only)
         sys.exit(0)
     except Exception as e:
-        print(e.message)
+        print(e)
         sys.exit(-1)
