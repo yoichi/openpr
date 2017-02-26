@@ -58,6 +58,18 @@ def get_pull_request_number(revision, base_branch):
     """
     if not re.match('^[0-9a-f]+$', revision):
         raise Exception('invalid revision: {0}'.format(revision))
+    args = ['git', 'merge-base',
+            '--is-ancestor',
+            revision,
+            base_branch]
+    try:
+        subprocess.check_output(args)
+    except subprocess.CalledProcessError as e:
+        if e.returncode == 1:
+            raise Exception(
+                '{revision} is not merged to {base_branch} yet'.format(
+                    **{'revision': revision, 'base_branch': base_branch}))
+        raise
     args = ['git', 'log',
             '--merges', '--oneline', '--reverse', '--ancestry-path',
             '{revision}...{base_branch}'.format(
