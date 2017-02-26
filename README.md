@@ -17,7 +17,7 @@ obtained by git blame.
 
 * local repository (remote "origin" points to GitHub or Bitbucket)
 * Python 2.7 or Python 3
-* git 2.7.0 or above
+* git
 
 ## Usage
 

@@ -43,7 +43,7 @@ def get_remote_url():
     :return: remote repository url
     :rtype: str
     """
-    args = ['git', 'remote', 'get-url', 'origin']
+    args = ['git', 'config', 'remote.origin.url']
     return subprocess.check_output(args).strip().decode('utf-8')
 
 
