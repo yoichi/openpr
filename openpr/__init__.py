@@ -96,7 +96,7 @@ def get_pull_request_url(service, module, number):
     return url.format(**{'module': module, 'number': number})
 
 
-def main(revision, base_branch, print_only):
+def openpr(revision, base_branch, print_only):
     """Find pull request from given commit hash and open it in a Web browser.
 
     :param str revision: revision string of the target commit
@@ -113,7 +113,7 @@ def main(revision, base_branch, print_only):
         webbrowser.open(pr_url)
 
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser(
         description='Find pull request from given commit hash and open it in a Web browser.')
     parser.add_argument(
@@ -130,8 +130,12 @@ if __name__ == '__main__':
         help='print pull request url instead of opening it')
     args = parser.parse_args()
     try:
-        main(args.revision, args.base_branch, args.print_only)
+        openpr(args.revision, args.base_branch, args.print_only)
         sys.exit(0)
     except Exception as e:
         print(e)
         sys.exit(-1)
+
+
+if __name__ == '__main__':
+    main()
