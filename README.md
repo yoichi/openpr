@@ -19,11 +19,15 @@ obtained by git blame.
 * Python 2.7 or Python 3
 * git
 
+## Installation
+
+	pip install openpr
+
 ## Usage
 
 Run as follows in the working tree
 
-`openpr.py [-h] [--base-branch BRANCH] [--print-only] revision`
+	openpr [-h] [--base-branch BRANCH] [--print-only] revision
 
 ## License
 
