@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name='openpr',
-    version='1.0.0',
+    version='1.1.0',
     url='https://github.com/yoichi/openpr',
     author='Yoichi Nakayama',
     author_email='yoichi.nakayama@gmail.com',
