@@ -47,6 +47,21 @@ def get_remote_url():
     return subprocess.check_output(args).strip().decode('utf-8')
 
 
+def extract_pull_request_number(commit_logs):
+    """Extract first occurance of pull request number from commit logs.
+
+    :param str commit_logs: oneline commit logs
+
+    :return: pull request number
+    :rtype: str
+    """
+    m = re.search('pull request #(\d+)', commit_logs)
+    if not m:
+        raise Exception(
+            'cannot detect pull request number by\n{0}'.format(commit_logs))
+    return m.group(1)
+
+
 def get_pull_request_number(revision, base_branch):
     """Get pull request number from commit messages.
 
@@ -74,12 +89,8 @@ def get_pull_request_number(revision, base_branch):
             '--merges', '--oneline', '--reverse', '--ancestry-path',
             '{revision}...{base_branch}'.format(
                 **{'revision': revision, 'base_branch': base_branch})]
-    output = subprocess.check_output(args)
-    m = re.search('pull request #(\d+)', output.decode('utf-8'))
-    if not m:
-        raise Exception(
-            'cannot detect pull request number by {0}'.format(' '.join(args)))
-    return m.group(1)
+    output = subprocess.check_output(args).decode('utf-8')
+    return extract_pull_request_number(output)
 
 
 def get_pull_request_url(service, module, number):

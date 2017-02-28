@@ -29,6 +29,20 @@ class TestOpenpr(unittest.TestCase):
             openpr.extract_service_and_module(
                 'git@bitbucket.org:yoichi22/sandbox.git'))
 
+    def test_extract_pull_request_number_gh(self):
+        self.assertEqual(
+            '123',
+            openpr.extract_pull_request_number(
+                '0000000 Merge pull request #123 from foo/master\n'
+                '1111111 Merge pull request #456 from bar/master'))
+
+    def test_extract_pull_request_number_bb(self):
+        self.assertEqual(
+            '123',
+            openpr.extract_pull_request_number(
+                '0000000 Merged in foo/master (pull request #123)\n'
+                '1111111 Merged in bar/master (pull request #456)'))
+
 
 if __name__ == '__main__':
     unittest.main()
