@@ -37,13 +37,15 @@ def extract_service_and_module(repo_url):
     return (service, module)
 
 
-def get_remote_url():
+def get_remote_url(remote):
     """Get remote repository url of current git repository.
+
+    :param str remote: remote name against which pull requests are created
 
     :return: remote repository url
     :rtype: str
     """
-    args = ['git', 'config', 'remote.origin.url']
+    args = ['git', 'config', 'remote.{}.url'.format(remote)]
     return subprocess.check_output(args).strip().decode('utf-8')
 
 
@@ -62,10 +64,11 @@ def extract_pull_request_number(commit_logs):
     return m.group(1)
 
 
-def get_pull_request_number(revision, base_branch):
+def get_pull_request_number(revision, remote, base_branch):
     """Get pull request number from commit messages.
 
     :param str revision: revision string
+    :param str remote: remote name against which pull requests are created
     :param str base_branch: branch against which pull request are merged
 
     :return: pull request number
@@ -73,22 +76,24 @@ def get_pull_request_number(revision, base_branch):
     """
     if not re.match('^[0-9a-f]+$', revision):
         raise Exception('invalid revision: {}'.format(revision))
+    tracking_branch = '{}/{}'.format(remote, base_branch)
     args = ['git', 'merge-base',
             '--is-ancestor',
             revision,
-            base_branch]
+            tracking_branch]
     try:
         subprocess.check_output(args)
     except subprocess.CalledProcessError as e:
         if e.returncode == 1:
             raise Exception(
-                '{revision} is not merged to {base_branch} yet'.format(
-                    **{'revision': revision, 'base_branch': base_branch}))
+                '{revision} is not merged to {tracking_branch} yet'.format(
+                    **{'revision': revision,
+                       'tracking_branch': tracking_branch}))
         raise
     args = ['git', 'log',
             '--merges', '--oneline', '--reverse', '--ancestry-path',
-            '{revision}...{base_branch}'.format(
-                **{'revision': revision, 'base_branch': base_branch})]
+            '{revision}...{tracking_branch}'.format(
+                **{'revision': revision, 'tracking_branch': tracking_branch})]
     output = subprocess.check_output(args).decode('utf-8')
     return extract_pull_request_number(output)
 
@@ -107,15 +112,16 @@ def get_pull_request_url(service, module, number):
     return url.format(**{'module': module, 'number': number})
 
 
-def openpr(revision, base_branch, print_only):
+def openpr(revision, base_branch, remote, print_only):
     """Find pull request from given commit hash and open it in a Web browser.
 
     :param str revision: revision string of the target commit
+    :param str remote: remote name against which pull requests are created
     :param str base_branch: branch against which pull requests are merged
     :param bool print_only: print pull request url instead of opening it
     """
-    number = get_pull_request_number(revision, base_branch)
-    repo_url = get_remote_url()
+    number = get_pull_request_number(revision, remote, base_branch)
+    repo_url = get_remote_url(remote)
     (service, module) = extract_service_and_module(repo_url)
     pr_url = get_pull_request_url(service, module, number)
     if print_only:
@@ -136,12 +142,16 @@ def main():
         default='master',
         help='branch against which pull requests are merged (default: master)')
     parser.add_argument(
+        '-r', '--remote',
+        default='origin',
+        help='remote name against which pull requests are created (default: origin)')
+    parser.add_argument(
         '-p', '--print-only',
         action='store_true',
         help='print pull request url instead of opening it')
     args = parser.parse_args()
     try:
-        openpr(args.revision, args.base_branch, args.print_only)
+        openpr(args.revision, args.base_branch, args.remote, args.print_only)
         sys.exit(0)
     except Exception as e:
         print(e)

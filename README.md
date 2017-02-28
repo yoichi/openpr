@@ -15,7 +15,7 @@ obtained by git blame.
 
 ## Requirement
 
-* local repository (remote "origin" points to GitHub or Bitbucket)
+* local repository (its remote points to GitHub or Bitbucket)
 * Python 2.7 or Python 3
 * git
 
@@ -27,7 +27,7 @@ obtained by git blame.
 
 Run as follows in the working tree
 
-	openpr [-h] [--base-branch BRANCH] [--print-only] revision
+	openpr [-h] [-b BRANCH] [-r REMOTE] [-p] revision
 
 ## License
 
