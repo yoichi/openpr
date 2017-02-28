@@ -28,12 +28,12 @@ def extract_service_and_module(repo_url):
     m = re.match('.+[/@]([^\.]+\.[^\.]+)[:/]([^/]+/[^/]+)\.git$', repo_url)
     if not m:
         raise Exception(
-            'cannot detect service and module from {0}'.format(repo_url))
+            'cannot detect service and module from {}'.format(repo_url))
     service = m.group(1)
     module = m.group(2)
     if service not in _pull_request_url.keys():
         raise Exception(
-            'service not supported: {0}'.format(service))
+            'service not supported: {}'.format(service))
     return (service, module)
 
 
@@ -58,7 +58,7 @@ def extract_pull_request_number(commit_logs):
     m = re.search('pull request #(\d+)', commit_logs)
     if not m:
         raise Exception(
-            'cannot detect pull request number by\n{0}'.format(commit_logs))
+            'cannot detect pull request number from\n{}'.format(commit_logs))
     return m.group(1)
 
 
@@ -72,7 +72,7 @@ def get_pull_request_number(revision, base_branch):
     :rtype: str
     """
     if not re.match('^[0-9a-f]+$', revision):
-        raise Exception('invalid revision: {0}'.format(revision))
+        raise Exception('invalid revision: {}'.format(revision))
     args = ['git', 'merge-base',
             '--is-ancestor',
             revision,
@@ -102,7 +102,7 @@ def get_pull_request_url(service, module, number):
     """
     if service not in _pull_request_url:
         raise Exception(
-            'service not supported: {0}'.format(service))
+            'service not supported: {}'.format(service))
     url = _pull_request_url[service]
     return url.format(**{'module': module, 'number': number})
 
