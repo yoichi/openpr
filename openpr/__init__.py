@@ -131,12 +131,12 @@ def main():
         'revision',
         help='revision string of the target commit')
     parser.add_argument(
-        '--base-branch',
+        '-b', '--base-branch',
         metavar='BRANCH',
         default='master',
         help='branch against which pull requests are merged (default: master)')
     parser.add_argument(
-        '--print-only',
+        '-p', '--print-only',
         action='store_true',
         help='print pull request url instead of opening it')
     args = parser.parse_args()
