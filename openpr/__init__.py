@@ -6,6 +6,7 @@ Supported Services: GitHub, Bitbucket
 """
 
 import argparse
+import os
 import re
 import subprocess
 import sys
@@ -37,6 +38,22 @@ def extract_service_and_module(repo_url):
     return (service, module)
 
 
+def _run_command(args):
+    """Run command and get its output.
+
+    :param list[str] args: command and arguments
+
+    :return: output of the command
+    :rtype: str
+
+    :raise subprocess.CalledProcessError: command failed
+    """
+    # don't use subprocess.DEVNULL for python2.7
+    with open(os.devnull, 'w') as devnull:
+        return subprocess.check_output(
+            args, stderr=devnull).strip().decode('utf-8')
+
+
 def get_remote_url(remote):
     """Get remote repository url of current git repository.
 
@@ -46,7 +63,7 @@ def get_remote_url(remote):
     :rtype: str
     """
     args = ['git', 'config', 'remote.{}.url'.format(remote)]
-    return subprocess.check_output(args).strip().decode('utf-8')
+    return _run_command(args)
 
 
 def extract_pull_request_number(commit_logs):
@@ -64,6 +81,27 @@ def extract_pull_request_number(commit_logs):
     return m.group(1)
 
 
+def get_default_tracking_branch(remote):
+    """Get default remote branch of the current repository.
+
+    detect by remote HEAD if present, or use "master" otherwise
+
+    :param str remote: remote name
+
+    :return: branch name
+    :rtype: str
+    """
+    head = 'remotes/{}/HEAD'.format(remote)
+    args = ['git', 'rev-parse', '--abbrev-ref', head]
+    try:
+        ref = _run_command(args)
+        if ref == head:
+            raise Exception
+        return ref
+    except Exception:
+        return '{}/master'.format(remote)
+
+
 def get_pull_request_number(revision, remote, base_branch):
     """Get pull request number from commit messages.
 
@@ -76,13 +114,16 @@ def get_pull_request_number(revision, remote, base_branch):
     """
     if not re.match('^[0-9a-f]+$', revision):
         raise Exception('invalid revision: {}'.format(revision))
-    tracking_branch = '{}/{}'.format(remote, base_branch)
+    if not base_branch:
+        tracking_branch = get_default_tracking_branch(remote)
+    else:
+        tracking_branch = '{}/{}'.format(remote, base_branch)
     args = ['git', 'merge-base',
             '--is-ancestor',
             revision,
             tracking_branch]
     try:
-        subprocess.check_output(args)
+        _run_command(args)
     except subprocess.CalledProcessError as e:
         if e.returncode == 1:
             raise Exception(
@@ -139,8 +180,8 @@ def main():
     parser.add_argument(
         '-b', '--base-branch',
         metavar='BRANCH',
-        default='master',
-        help='branch against which pull requests are merged (default: master)')
+        default='',
+        help='branch against which pull requests are merged (default: detect by remote HEAD if present, or use "master" otherwise')
     parser.add_argument(
         '-r', '--remote',
         default='origin',
