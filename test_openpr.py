@@ -8,6 +8,12 @@ import unittest
 import openpr
 
 
+def _call(args):
+    # don't use subprocess.DEVNULL for python2.7
+    with open(os.devnull, 'w') as devnull:
+        subprocess.call(args, stdout=devnull, stderr=devnull)
+
+
 class TempDir(object):
     def __enter__(self):
         self._directory = tempfile.mkdtemp()
@@ -73,20 +79,19 @@ class TestOpenpr(unittest.TestCase):
     def test_get_default_tracking_branch(self):
         """Detect default branch from remotes/origin/HEAD."""
         branch = 'trunk'
-        call = subprocess.call
         with TempDir() as temp_dir:
             with ChangeDir(temp_dir):
-                call(['git', 'init', '--bare', 'foo_origin'])
-                call(['git', 'clone', 'foo_origin', 'foo_temp'])
+                _call(['git', 'init', '--bare', 'foo_origin'])
+                _call(['git', 'clone', 'foo_origin', 'foo_temp'])
             with ChangeDir(os.path.join(temp_dir, 'foo_temp')):
-                call(['git', 'checkout', '-b', 'trunk'])
-                call(['git', 'commit', '--allow-empty', '-m', 'message'])
-                call(['git', 'push', 'origin', branch])
+                _call(['git', 'checkout', '-b', 'trunk'])
+                _call(['git', 'commit', '--allow-empty', '-m', 'message'])
+                _call(['git', 'push', 'origin', branch])
             with ChangeDir(os.path.join(temp_dir, 'foo_origin')):
-                call(['git', 'symbolic-ref', 'HEAD',
+                _call(['git', 'symbolic-ref', 'HEAD',
                       'refs/heads/{}'.format(branch)])
             with ChangeDir(temp_dir):
-                call(['git', 'clone', 'foo_origin', 'foo'])
+                _call(['git', 'clone', 'foo_origin', 'foo'])
             with ChangeDir(os.path.join(temp_dir, 'foo')):
                 remote = 'origin'
                 self.assertEqual(openpr.get_default_tracking_branch(remote),
@@ -94,17 +99,48 @@ class TestOpenpr(unittest.TestCase):
 
     def test_get_default_tracking_branch_fallback(self):
         """Without remotes/origin/HEAD, fallback to origin/master."""
-        call = subprocess.call
         with TempDir() as temp_dir:
             with ChangeDir(temp_dir):
-                call(['git', 'init', '--bare', 'foo_origin'])
-                call(['git', 'clone', 'foo_origin', 'foo'])
+                _call(['git', 'init', '--bare', 'foo_origin'])
+                _call(['git', 'clone', 'foo_origin', 'foo'])
             with ChangeDir(os.path.join(temp_dir, 'foo')):
-                call(['git', 'commit', '--allow-empty', '-m', 'message'])
-                call(['git', 'push', '-u', 'origin', 'master'])
+                _call(['git', 'commit', '--allow-empty', '-m', 'message'])
+                _call(['git', 'push', '-u', 'origin', 'master'])
                 remote = 'origin'
                 self.assertEqual(openpr.get_default_tracking_branch(remote),
                                  '{}/master'.format(remote))
+
+    def test_get_remote_url(self):
+        remote = 'bar'
+        remote_url = 'foo_origin'
+        with TempDir() as temp_dir:
+            with ChangeDir(temp_dir):
+                _call(['git', 'init', 'foo'])
+            with ChangeDir(os.path.join(temp_dir, 'foo')):
+                _call(['git', 'remote', 'add', remote, remote_url])
+                self.assertEqual(openpr.get_remote_url(remote), remote_url)
+
+    def test_get_pull_request_number(self):
+        number = '123'
+        with TempDir() as temp_dir:
+            with ChangeDir(temp_dir):
+                _call(['git', 'init', '--bare', 'foo_origin'])
+                _call(['git', 'clone', 'foo_origin', 'foo'])
+            with ChangeDir(os.path.join(temp_dir, 'foo')):
+                _call(['git', 'commit', '--allow-empty', '-m', 'message'])
+                _call(['git', 'checkout', '-b', 'feature'])
+                _call(['git', 'commit', '--allow-empty', '-m', 'implement'])
+                revision = subprocess.check_output(
+                    ['git', 'rev-parse', 'HEAD']).strip().decode('utf-8')
+                _call(['git', 'push', '-u', 'origin', 'feature'])
+                _call(['git', 'checkout', 'master'])
+                _call(['git', 'merge', '--no-ff', 'feature', '-m',
+                       'Merge pull request #{} from feature'.format(number)])
+                _call(['git', 'push', '-u', 'origin', 'master'])
+                self.assertEqual(openpr.get_pull_request_number(revision,
+                                                                'origin',
+                                                                'master'),
+                                 number)
 
 
 if __name__ == '__main__':
