@@ -85,6 +85,7 @@ class TestOpenpr(unittest.TestCase):
                 _call(['git', 'clone', 'foo_origin', 'foo_temp'])
             with ChangeDir(os.path.join(temp_dir, 'foo_temp')):
                 _call(['git', 'checkout', '-b', 'trunk'])
+                _call(['git', 'config', 'user.email', 'test@example.com'])
                 _call(['git', 'commit', '--allow-empty', '-m', 'message'])
                 _call(['git', 'push', 'origin', branch])
             with ChangeDir(os.path.join(temp_dir, 'foo_origin')):
@@ -104,6 +105,7 @@ class TestOpenpr(unittest.TestCase):
                 _call(['git', 'init', '--bare', 'foo_origin'])
                 _call(['git', 'clone', 'foo_origin', 'foo'])
             with ChangeDir(os.path.join(temp_dir, 'foo')):
+                _call(['git', 'config', 'user.email', 'test@example.com'])
                 _call(['git', 'commit', '--allow-empty', '-m', 'message'])
                 _call(['git', 'push', '-u', 'origin', 'master'])
                 remote = 'origin'
@@ -127,6 +129,7 @@ class TestOpenpr(unittest.TestCase):
                 _call(['git', 'init', '--bare', 'foo_origin'])
                 _call(['git', 'clone', 'foo_origin', 'foo'])
             with ChangeDir(os.path.join(temp_dir, 'foo')):
+                _call(['git', 'config', 'user.email', 'test@example.com'])
                 _call(['git', 'commit', '--allow-empty', '-m', 'message'])
                 _call(['git', 'checkout', '-b', 'feature'])
                 _call(['git', 'commit', '--allow-empty', '-m', 'implement'])
