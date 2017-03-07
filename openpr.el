@@ -13,10 +13,13 @@
   "Open pull request include the commit in a Web browser.
 The commit hash is read from current point."
   (interactive)
-  (let ((cw (current-word)))
-    (if (string-match openpr-commit-hash-regexp cw)
-	(call-process "openpr" nil nil nil cw)
-      (error "current-word is not a commit hash"))))
+  (let ((hash (cond ((bound-and-true-p magit-blame-mode)
+		     (magit-blame-chunk-get :hash))
+		    (t
+		     (current-word)))))
+    (if (string-match openpr-commit-hash-regexp hash)
+	(call-process "openpr" nil nil nil hash)
+      (error "cannot detect commit hash from current point"))))
 
 (provide 'openpr)
 
