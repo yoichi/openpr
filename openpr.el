@@ -17,9 +17,10 @@ The commit hash is read from current point."
 		     (magit-blame-chunk-get :hash))
 		    (t
 		     (current-word)))))
-    (if (string-match openpr-commit-hash-regexp hash)
-	(call-process "openpr" nil nil nil hash)
-      (error "cannot detect commit hash from current point"))))
+    (unless (string-match openpr-commit-hash-regexp hash)
+      (error "cannot detect commit hash from current point"))
+    (unless (eq 0 (call-process "openpr" nil nil nil hash))
+      (error "openpr failed"))))
 
 (provide 'openpr)
 
