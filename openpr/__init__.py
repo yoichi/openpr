@@ -172,6 +172,7 @@ def openpr(revision, base_branch, remote, print_only):
 
 
 def main():
+    """Parse command line arguments and call openpr()."""
     parser = argparse.ArgumentParser(
         description='Find pull request from given commit hash and open it in a Web browser.')
     parser.add_argument(
