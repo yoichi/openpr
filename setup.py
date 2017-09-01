@@ -14,5 +14,8 @@ setuptools.setup(
             'openpr = openpr:main',
         ],
     },
+    setup_requires=[
+        'flake8',
+    ],
     test_suite='test_openpr'
 )

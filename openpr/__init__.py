@@ -182,7 +182,8 @@ def main():
         '-b', '--base-branch',
         metavar='BRANCH',
         default='',
-        help='branch against which pull requests are merged (default: detect by remote HEAD if present, or use "master" otherwise')
+        help=('branch against which pull requests are merged (default: detect by remote HEAD if '
+              'present, or use "master" otherwise'))
     parser.add_argument(
         '-r', '--remote',
         default='origin',
