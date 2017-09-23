@@ -1,6 +1,8 @@
 openpr
 ======
 
+[![Build Status](https://travis-ci.org/yoichi/openpr.svg)](https://travis-ci.org/yoichi/openpr)
+
 Find pull request from given commit hash and open it in a Web browser.
 
 ## Description
