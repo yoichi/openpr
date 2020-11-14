@@ -18,7 +18,7 @@ obtained by git blame.
 ## Requirement
 
 * local repository (its remote points to GitHub or Bitbucket)
-* Python 2.7 or Python 3
+* Python 3
 * git
 
 ## Installation
