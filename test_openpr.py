@@ -9,9 +9,7 @@ import openpr
 
 
 def _call(args):
-    # don't use subprocess.DEVNULL for python2.7
-    with open(os.devnull, 'w') as devnull:
-        subprocess.check_call(args, stdout=devnull, stderr=devnull)
+    subprocess.check_call(args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
 class TempDir(object):

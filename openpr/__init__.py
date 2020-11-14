@@ -50,10 +50,8 @@ def _run_command(args):
 
     :raise subprocess.CalledProcessError: command failed
     """
-    # don't use subprocess.DEVNULL for python2.7
-    with open(os.devnull, 'w') as devnull:
-        return subprocess.check_output(
-            args, stderr=devnull).strip().decode('utf-8')
+    return subprocess.check_output(
+        args, stderr=subprocess.DEVNULL).strip().decode('utf-8')
 
 
 def get_remote_url(remote):
