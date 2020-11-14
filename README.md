@@ -1,7 +1,7 @@
 openpr
 ======
 
-[![Build Status](https://travis-ci.org/yoichi/openpr.svg)](https://travis-ci.org/yoichi/openpr)
+![Python package](https://github.com/yoichi/openpr/workflows/Python%20package/badge.svg)
 
 Find pull request from given commit hash and open it in a Web browser.
 
