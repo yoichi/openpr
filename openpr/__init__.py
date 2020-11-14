@@ -26,9 +26,9 @@ def extract_service_and_module(repo_url):
     :return (service, module)
     :rtype (str, str)
     """
-    m = re.match('.+[/@]([^\.]+\.[^\.]+)[:/]([^/]+/[^/]+)\.git/?$', repo_url)
+    m = re.match(r'.+[/@]([^\.]+\.[^\.]+)[:/]([^/]+/[^/]+)\.git/?$', repo_url)
     if not m:
-        m = re.match('.+[/@]([^\.]+\.[^\.]+)[:/]([^/]+/[^/]+)/?$', repo_url)
+        m = re.match(r'.+[/@]([^\.]+\.[^\.]+)[:/]([^/]+/[^/]+)/?$', repo_url)
         if not m:
             raise Exception(
                 'cannot detect service and module from {}'.format(repo_url))
@@ -76,7 +76,7 @@ def extract_pull_request_number(commit_logs):
     :return: pull request number
     :rtype: str
     """
-    m = re.search('pull request #(\d+)', commit_logs)
+    m = re.search(r'pull request #(\d+)', commit_logs)
     if not m:
         raise Exception(
             'cannot detect pull request number from\n{}'.format(commit_logs))
@@ -114,7 +114,7 @@ def get_pull_request_number(revision, remote, base_branch):
     :return: pull request number
     :rtype: str
     """
-    if not re.match('^[0-9a-f]+$', revision):
+    if not re.match(r'^[0-9a-f]+$', revision):
         raise Exception('invalid revision: {}'.format(revision))
     if not base_branch:
         tracking_branch = get_default_tracking_branch(remote)
