@@ -28,8 +28,10 @@ def extract_service_and_module(repo_url):
     """
     m = re.match('.+[/@]([^\.]+\.[^\.]+)[:/]([^/]+/[^/]+)\.git$', repo_url)
     if not m:
-        raise Exception(
-            'cannot detect service and module from {}'.format(repo_url))
+        m = re.match('.+[/@]([^\.]+\.[^\.]+)[:/]([^/]+/[^/]+)$', repo_url)
+        if not m:
+            raise Exception(
+                'cannot detect service and module from {}'.format(repo_url))
     service = m.group(1)
     module = m.group(2)
     if service not in _pull_request_url.keys():
