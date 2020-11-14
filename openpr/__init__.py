@@ -26,9 +26,9 @@ def extract_service_and_module(repo_url):
     :return (service, module)
     :rtype (str, str)
     """
-    m = re.match('.+[/@]([^\.]+\.[^\.]+)[:/]([^/]+/[^/]+)\.git$', repo_url)
+    m = re.match('.+[/@]([^\.]+\.[^\.]+)[:/]([^/]+/[^/]+)\.git/?$', repo_url)
     if not m:
-        m = re.match('.+[/@]([^\.]+\.[^\.]+)[:/]([^/]+/[^/]+)$', repo_url)
+        m = re.match('.+[/@]([^\.]+\.[^\.]+)[:/]([^/]+/[^/]+)/?$', repo_url)
         if not m:
             raise Exception(
                 'cannot detect service and module from {}'.format(repo_url))

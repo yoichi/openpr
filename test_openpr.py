@@ -50,6 +50,16 @@ class TestOpenpr(unittest.TestCase):
             openpr.extract_service_and_module(
                 'https://github.com/yoichi/openpr'))
 
+    def test_extract_service_and_module_gh_with_trailing_slash(self):
+        self.assertEqual(
+            ('github.com', 'yoichi/openpr'),
+            openpr.extract_service_and_module(
+                'https://github.com/yoichi/openpr.git/'))
+        self.assertEqual(
+            ('github.com', 'yoichi/openpr'),
+            openpr.extract_service_and_module(
+                'https://github.com/yoichi/openpr/'))
+
     def test_extract_service_and_module_gh_ssh(self):
         self.assertEqual(
             ('github.com', 'yoichi/openpr'),
