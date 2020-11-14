@@ -11,7 +11,7 @@ import openpr
 def _call(args):
     # don't use subprocess.DEVNULL for python2.7
     with open(os.devnull, 'w') as devnull:
-        subprocess.call(args, stdout=devnull, stderr=devnull)
+        subprocess.check_call(args, stdout=devnull, stderr=devnull)
 
 
 class TempDir(object):
@@ -102,6 +102,7 @@ class TestOpenpr(unittest.TestCase):
             with ChangeDir(os.path.join(temp_dir, 'foo_temp')):
                 _call(['git', 'checkout', '-b', 'trunk'])
                 _call(['git', 'config', 'user.email', 'test@example.com'])
+                _call(['git', 'config', 'user.name', 'test'])
                 _call(['git', 'commit', '--allow-empty', '-m', 'message'])
                 _call(['git', 'push', 'origin', branch])
             with ChangeDir(os.path.join(temp_dir, 'foo_origin')):
@@ -122,6 +123,7 @@ class TestOpenpr(unittest.TestCase):
                 _call(['git', 'clone', 'foo_origin', 'foo'])
             with ChangeDir(os.path.join(temp_dir, 'foo')):
                 _call(['git', 'config', 'user.email', 'test@example.com'])
+                _call(['git', 'config', 'user.name', 'test'])
                 _call(['git', 'commit', '--allow-empty', '-m', 'message'])
                 _call(['git', 'push', '-u', 'origin', 'master'])
                 remote = 'origin'
@@ -146,6 +148,7 @@ class TestOpenpr(unittest.TestCase):
                 _call(['git', 'clone', 'foo_origin', 'foo'])
             with ChangeDir(os.path.join(temp_dir, 'foo')):
                 _call(['git', 'config', 'user.email', 'test@example.com'])
+                _call(['git', 'config', 'user.name', 'test'])
                 _call(['git', 'commit', '--allow-empty', '-m', 'message'])
                 _call(['git', 'checkout', '-b', 'feature'])
                 _call(['git', 'commit', '--allow-empty', '-m', 'implement'])
