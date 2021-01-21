@@ -67,7 +67,7 @@ def get_remote_url(remote):
 
 
 def extract_pull_request_number(commit_logs):
-    """Extract first occurance of pull request number from commit logs.
+    """Extract first occurrence of pull request number from commit logs.
 
     :param str commit_logs: oneline commit logs
 
